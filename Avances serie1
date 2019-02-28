@@ -83,3 +83,14 @@ y(:)
 %format short 
 T= table(x(:),y(:));
 
+% 12.- 
+x=[];
+y=[];
+z=[];
+N=100;
+h=2/N;
+for n=1:N+1
+    x(n)=(n-1)*h
+    y(n)=sqrt(x(n));
+    z(n)=(x(n))^2
+end
