@@ -69,3 +69,17 @@ x(245)
 x(246)
 x(249)
 x(250)
+% 11.-
+x=[]
+y=[]
+for k=1:11
+    x(k)=k-1;
+    y(k)=sin(x(k));
+end
+
+x(:)
+y(:)
+
+%format short 
+T= table(x(:),y(:));
+
