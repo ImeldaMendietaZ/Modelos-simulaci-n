@@ -1,0 +1,45 @@
+#Prueba binomial
+
+#Prueba de una muestra. H0: p=0.5 vs. Ha: p<>0.5
+
+binom.test(37, 58, p = 0.5,alternative =c("two.sided"),conf.level = 0.95) #c("two.sided", "less", "greater") correct=FALSE
+# se hace una prueba binomial, donde existieeron 37 exitos de 58 eventos.....se rechaza la hipotesis nula porque el valor es menor a 0.05
+##########################################################################
+x<-rnorm(100,2,3) # son 100 valores con una media de 2y desviación estandar de 3.... los 100 valores se generaron
+# es solo una simulación porque no tengo datos en caso contrario se usan los datos
+boxplot(x) # diagrama de caja con intervalo al 95% para diferenciar los cuatiles y loslimitantes, observar el comportamiento en los cuantiles
+t.test(x,mu=2,alternative=c("two.sided"),conf.level=0.95) # es una prueba t de lña variable x, con miu=2 y es de dos colas
+#valor de t, grados de libertad y un valor p asociado, el valor t en valor absoluto debe de ser mayor a 2 y el p value debe ser más pequeño
+
+
+smokers  <- c( 83, 90, 129, 70 )
+patients <- c( 86, 93, 136, 82 )
+prop.test(smokers, patients)
+# prueba d ecuatro muestras para igualar proporciones
+# fumadores de pacientes, se asocian 3 grados de libertad
+# se rechaza la hipotesis nula y se dice que las proporciones no son iguales, la hipotesis nula decia que las proiporciones son iguales
+# por lo cual la hipotesis alternativa dice que las proporciones son diferentes
+# en conslusión se rechaza la hipotesis nula
+#
+
+#######################################################################################################
+
+x1<-rnorm(100)
+x2<-rnorm(100,1,1)
+#simular x1 y x2
+# x1 son 100 valores de una normal estandar 
+#x2 son 100 valores de una normal con media 1 y desviacion estandar 1
+boxplot(x1,x2)
+# esta grafica nos dice que no tienen la misma media 
+plot(density(x1),xlab="",ylab="",col="blue")
+
+par(new=T) # para que se grafiqeun las dos variables en la misma grafica
+plot(density(x2),xlab="",ylab="",col="red")
+#se observa de mejor manera que la media es distinta para ambas variables
+
+
+#Mas mejor
+
+library(lattice) # que hace la libreria????
+pob<-factor(c(rep(1,100),rep(2,100)))
+x3<-c(x1,x2)
