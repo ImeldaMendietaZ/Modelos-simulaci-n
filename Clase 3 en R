@@ -1,0 +1,323 @@
+#Prueba binomial
+
+#Prueba de una muestra. H0: p=0.5 vs. Ha: p<>0.5
+
+binom.test(37, 58, p = 0.5,alternative =c("two.sided"),conf.level = 0.95) #c("two.sided", "less", "greater") correct=FALSE
+# se hace una prueba binomial, donde existieeron 37 exitos de 58 eventos.....se rechaza la hipotesis nula porque el valor es menor a 0.05
+##########################################################################
+x<-rnorm(100,2,3) # son 100 valores con una media de 2y desviación estandar de 3.... los 100 valores se generaron
+# es solo una simulación porque no tengo datos en caso contrario se usan los datos
+boxplot(x) # diagrama de caja con intervalo al 95% para diferenciar los cuatiles y loslimitantes, observar el comportamiento en los cuantiles
+t.test(x,mu=2,alternative=c("two.sided"),conf.level=0.95) # es una prueba t de lña variable x, con miu=2 y es de dos colas
+#valor de t, grados de libertad y un valor p asociado, el valor t en valor absoluto debe de ser mayor a 2 y el p value debe ser más pequeño
+
+norm.test<-function (x, mu, desviacion.estandar,
+alternativa = c("dos.colas", "menor", "mayor"), sd = desviacion.estandar){
+if (missing(desviacion.estandar) && missing(sd))
+stop("Se debe especificar la desviación estándar de la población")
+
+alternativa <- match.arg(alternativa)
+n <- length(x)
+z <- (mean(x) - mu)/(sd/sqrt(n))
+p.value <- switch(alternativa, dos.colas= 2 * pnorm(abs(z),lower.tail = FALSE), menor = pnorm(z), mayor = 1 - pnorm(z))
+return(list(z=z,p.value=p.value))
+}
+
+
+norm.test(x,2,3,alternativa="dos.colas")
+
+
+#####################################################################################
+
+wilcox.test(x,mu=2,alternative=c("two.sided"),conf.level=0.95)
+# la prueba nos dice que no es muy diferente, no es excato pero tampoco es muy distinto
+
+#######################################################################################
+
+
+smokers  <- c( 83, 90, 129, 70 )
+patients <- c( 86, 93, 136, 82 )
+prop.test(smokers, patients)
+# prueba d ecuatro muestras para igualar proporciones
+# fumadores de pacientes, se asocian 3 grados de libertad
+# se rechaza la hipotesis nula y se dice que las proporciones no son iguales, la hipotesis nula decia que las proiporciones son iguales
+# por lo cual la hipotesis alternativa dice que las proporciones son diferentes
+# en conslusión se rechaza la hipotesis nula
+#
+
+#######################################################################################################
+
+x1<-rnorm(100)
+x2<-rnorm(100,1,1)
+#simular x1 y x2
+# x1 son 100 valores de una normal estandar 
+#x2 son 100 valores de una normal con media 1 y desviacion estandar 1
+boxplot(x1,x2)
+# esta grafica nos dice que no tienen la misma media 
+plot(density(x1),xlab="",ylab="",col="blue")
+
+par(new=T) # para que se grafiqeun las dos variables en la misma grafica
+plot(density(x2),xlab="",ylab="",col="red")
+#se observa de mejor manera que la media es distinta para ambas variables
+
+
+#Mas mejor
+
+library(lattice) # que hace la libreria????
+pob<-factor(c(rep(1,100),rep(2,100))) # expplicar para que sirve "factor", es para variables categoricas que tienen dos niveles
+# es un vector que especifica el nivel, en este caso es 1 y 2
+x3<-c(x1,x2) # la variable x3 esta concatenando las variables x1 y x2
+
+datos<-data.frame(x3,pob) # es un datafram para ordena rlos 200 datos de las variables x3 y pob, en la segunda columna esta el factor o nivel de las variables
+
+densityplot(~x3, data=datos,groups=pob,plot.points=TRUE,ref=FALSE) # se puede observar el error, el cual tmabién se distingue por colores
+
+
+t.test(x1,x2,alternative=c("two.sided"),conf.level=0.95) #paired=T muestras pareadas
+# si el estadistico t si es mayor a 2 en valor absoluto es muy significativo, y como es mayor a 2
+# se rechaza la hipotesis nula 
+# el intervalo de confianza al 95% es negativo con valores de -1.2447297 -0.6559369
+# 
+
+#########################################################################################################
+### Probar supuestos para la prueba anterior. Poblaciones normales e igualdad de varianzas
+
+shapiro.test(x1) # prueba de normalidad no se rechaza la hipotesis nula
+
+shapiro.test(x2) # preueba de normalidad donde tampoco se rechaza la hipotesis nula 
+
+var.test(x1,x2,alternative=c("two.sided"),conf.level=0.95) # prueba de varianzas
+# si el valor de F es grande se rechaza H0, en este caso no se rechaza, si fuera un valor de 1 las medias son iguales
+# la prueba nos dice que el resultado no es muy diferente a 1
+
+#########################################################################################################
+### Alternativa no paramétrica
+
+wilcox.test(x1,x2,alternative=c("two.sided"),conf.level=0.95)
+# el valor p es muy significativo por lo cual se rechaza la hipotesis nula 
+# esta prueba trabaja con diferencia de medias porque es una prueba no paramétrica
+# contrasta las diferencias de la mediana
+
+
+##########################################################################################################
+### Prueba de independencia
+
+x <- matrix(c(12, 5, 7, 7), ncol = 2, nrow=2)
+chtest<-chisq.test(x,correct = TRUE) #correct=TRUE es el dafault
+# 
+chtest$p.value #  0.4233054
+chisq.test(x,simulate.p.value=TRUE,B=10000)$p.value  # 0.2959704
+# no se rechaza la hipotesis nula, la cual dice que las muestras son independientes
+# se dice que si hay independencia, las variables no estan correlacionadas 
+chtest$observed # valores observados
+chtest$expected # valores esperados
+chtest$residuals # son los residuales
+# se hace la diferencia de los valores observados y espérados
+# 
+### Es recomendable usar la Ji-cuadrada???
+###########################################################################################
+
+#Ji-cuadrada de bondad de ajuste (homogeneidad)
+# Simulacion de un dado honesto
+
+dados= sample(1:6,200,p=c(1,1,1,1,1,1)/6,replace=T)
+dd<-table(dados)
+
+### Prueba de bondad de ajuste (homogeneidad)
+
+chisq.test(dd,p=c(1,1,1,1,1,1)/6)
+chisq.test(x, p=p, simulate.p.value = TRUE, B = 10000)$p.value
+
+#############################################################################
+### Prueba exacta de Fisher
+
+x <- matrix(c(12, 5, 7, 7), ncol = 2)
+fisher.test(x)
+fisher.test(x)$p.value
+fisher.test(x, simulate.p.value=TRUE, B=10000)
+
+##############################################################################
+### Correlacion
+
+x <- c(44.4, 45.9, 41.9, 53.3, 44.7, 44.1, 50.7, 45.2, 60.1)
+y <- c( 2.6,  3.1,  2.5,  5.0,  3.6,  4.0,  5.2,  2.8,  3.8)
+
+cor.test(x, y,alternative = c("two.sided"),method = c("pearson"), conf.level = 0.95)
+
+
+cor.test(x, y,alternative = c("two.sided"),method = c("spearman"),
+         exact = FALSE, conf.level = 0.95) #Intervalo de confianza solo para la alternativa pearson
+         
+cor.test(x, y,alternative = c("two.sided"),method = c("spearman"),
+         exact = TRUE, conf.level = 0.95)
+         
+##############################################################################
+#### Igualdad de varianza para 3 poblaciones
+
+library(pgirmess)
+
+x<-cbind(rnorm(50),rnorm(50,1,1),rnorm(50,2,1))
+grupo<-factor(c(rep(0,50),rep(1,50),rep(2,50)))
+
+boxplot(x[,1],x[,2],x[,3])
+
+library(lattice)
+
+x1<-c(x[,1],x[,2],x[,3])
+
+datos1<-data.frame(x1,grupo)
+
+densityplot(~x1, data=datos1,groups=grupo,plot.points=TRUE)
+
+library(stats)
+
+bartlett.test(x1,grupo)
+
+bartlett.test(x1~grupo,data=datos1)
+
+library(car)
+
+levene.test(x1,grupo)
+
+levene.test(x1~grupo, data=datos1)
+
+fligner.test(x1,grupo) #Prueba no parametrica por rangos
+
+fligner.test(x1,grupo,data=datos1)
+
+friedman.test(x,grupo) 
+
+friedmanmc(x,grupo) 
+
+##############################################################################
+
+
+
+resp<-c(0.44,0.44,0.54,0.32,0.21,0.28,0.7,0.77,0.48,0.64,0.71,0.75,0.8,0.76,0.34,0.80,0.73,0.8)
+categ<-as.factor(rep(c("A","B","C"),each=6))
+
+kruskal.test(resp,categ)
+
+kruskalmc(resp, categ)
+
+#kruskalmc(resp, categ, prob=0.02)# pa' controlar el nivel de sig. de las pruebas individuales
+
+
+x <- c(2.9, 3.0, 2.5, 2.6, 3.2) # normal subjects
+y <- c(3.8, 2.7, 4.0, 2.4)      # with obstructive airway disease
+z <- c(2.8, 3.4, 3.7, 2.2, 2.0) # with asbestosis
+fac<-factor(c(rep(1,5),rep(2,4),rep(3,5)))
+kruskal.test(c(x, y, z),fac)
+
+
+#############################################################################################
+x<-c(rnorm(50),rnorm(50,1,1),rnorm(50,2,1))
+grupo<-factor(c(rep(0,50),rep(1,50),rep(2,50)))
+
+boxplot(x~grupo)
+
+
+summary(ajuste<-aov(x~grupo))
+
+TukeyHSD(ajuste, "grupo", ordered = TRUE)
+plot(TukeyHSD(ajuste, "grupo"),col=c("red","blue","green")) #También se puede guardar como un objeto y usar plot(nombre objeto)
+
+##################################################################################################
+
+#Todas las distribuciones tienen media?
+
+pmovil<-function(x){
+n<-length(x)
+ret<-rep(0,n)
+for (k in 1:n){ret[k]<-mean(x[1:k])}
+return(ret)
+}
+x<-rnorm(10000)
+#x<-rcauchy(10000)
+plot(pmovil(x),type="l")
+abline(h=0)
+
+########################################################################################################
+
+#Rumbo a bondad de ajuste
+
+x<-rnorm(500)
+
+par(mfrow=c(1,2))
+
+plot(density(x),col="blue")
+
+curve(dnorm(x),from=-3,to=3,add=T,col="green")
+
+plot(ecdf(x),lty=1)
+
+curve(pnorm(x),from=-3,to=3,add=T,col="violet")
+
+#Exploracion grafica
+
+qqnorm(x)
+qqline(x, col="violet")
+
+y<-rt(100,9)
+plot(qt(ppoints(y),9),sort(y))
+abline(c(0,1),col="blue")
+
+z<-rexp(100)
+plot(qexp(ppoints(z),1),sort(z))
+abline(c(0,1),col="green")
+
+
+hist(x,prob=T)
+
+lines(density(x),col="green")
+
+
+#Pruebas formales para normalidad
+
+library(nortest)
+
+c(shapiro.test(x),ks.test(x,"pnorm",m=0,sd=1), sf.test(x), ad.test(x),cvm.test(x),lillie.test(x),pearson.test(x))
+
+library(ADGofTest)
+x<-rweibull(100,2,3)
+ad.test(x,pweibull,2,3)
+
+p<-rpois(100,3)
+ad.test(p,ppois,3)
+
+
+#Estimacion de los parametros de una distribucion
+
+library(MASS)
+
+x<-rnorm(100,10,4)
+
+fitdistr(x, "normal")
+
+
+w<-rweibull(100,3,10)
+
+fitdistr(w,"Weibull")
+
+e<-rexp(3)
+
+
+fitdistr(e,"exponential")
+
+################## El teorema central del límite dinámico
+
+library(TeachingDemos)
+library(tcltk)
+vis.binom()
+
+############Explorando la verosimilitud
+
+mle.demo()
+
+
+
+
+
+
+ 
+
