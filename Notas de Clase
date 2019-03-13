@@ -1,0 +1,35 @@
+regresión multiple se evalua con 
+la regresión simple se evalua con una recta en un diagrama de dispersión
+sigma cuadrada con subindice t quiere decir que depende de t y si es otra variable el subindice quiere decir que es constante lo cual 
+no podría ser porque daria como resultado una varianza explosiva
+Residuo crudo e_i >>> no es facil determinar que tan grande es. depende de la escala de la respuesta
+Residuo estandarizado: es el residuo crudo dividido por la raiz cuadrada del estimador de la varianza
+Residuo estudentizado interno: es el residuo crudo dividido entre la raíz cuadrada de su varianza
+Residuo estudentizado externo
+
+pp-plot  da los residuos estandarizados de x.... si no se ajusta es porque los errores no se distribuyen normal
+en el multiple es la x contra los residuos
+x contra el error (residuos) 
+la linealidad es de x a y
+
+
+Estadisticos para evaluar
+1.-. Distancia de cook >>> sirve para determianr si una observación es influyente ene l vector de parametros.
+2.-. Dfbetas >>> es para saber si es influyente en la regresion
+3.-. Dffits >>> para saber si es influyente en la predicción de Y
+
+multicolinealidad >>> independencia si los regresores son ortogonales
+efectos:
+1. varianzas de los coeficientes estimados muy grandes
+2. los signos de los parametros pueden cambiar
+
+matriz de correlación >>> para evaluar
+la correlación no siempre es signficativa si es grande o si es pequeña no siempre quiere decir que no es significativa
+
+factor de inflación de la varianza (VIF) >>> debe ser grande 
+si exceden a 10 hay multicolinealidad
+
+evaluar:
+analisis
+numero de condicion con eigenvalores >>>menor a 100 no hay colinealidad, entre 100 y 1000 hay moderada colinealidad y mayor a 1000 hay severa colinealidad
+indice de condicion >>> menor que 10 no hay problema alguno, 
