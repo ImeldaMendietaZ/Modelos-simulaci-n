@@ -1,0 +1,208 @@
+#REGRESION
+library(alr3)    # explicar para que sirve cada librería
+library(car)
+library(stats)
+library(nortest)
+
+require("car")
+require("alr3")
+
+# install.packages("alr3")
+# install.packages("car")
+
+#Simple
+x2<-rnorm(100,10,2)  
+x1<-rnorm(100,5,0.5)
+u<-runif(100)
+x3<-ifelse(u<=0.5,0,1)
+x4<-rbinom(100,1,0.5)
+
+y<-3+1.8*x1+rnorm(100,0,1) # es simulada con constante 3, beta1 de 1.8 y error aleatorio normal estandar 
+y # variable de respuesta explicada, hendógena
+plot(x1,y) # gráfica de una regresión lineal simple (diagrama de dispersión) solo si es una regresion multiple no se pone
+# cuando se pide un modelo de regresion siempre va primero la grafica (afuerza)
+
+lines(lowess(y~x1)) # la linea(recata o no) da el comportamiento de los datos
+
+cor.test(x1,y,alternative="two.sided", conf.level=0.95) # esta función ya da la prueba de correlación de pearson
+# da una estimación para un intervalo de confianza al 95%
+# la hipoetesis nula es cero, lo cual en este ejemplo no es asi 
+# por lo que se rechaza la hipotesis nula, o bien no se rechaza 
+
+data.ellipse(x1,y)
+
+ajuste<-lm(y~x1)
+ajuste # se almacena el comando rapido de la regresión, nos da el coeficiente y el beta cero
+summary(ajuste) # los estimados, con el error estandar.... en este caso son altamente significativos
+#se rechaza la hipotesis nula 
+
+anova(ajuste) # la suma de cuadrados y el valor F, el cual es grande y altamente significativa
+
+plot(x1,y)
+abline(ajuste,col="purple") #con el comando abline se obtiene la linea recta del ajuste 
+
+id<-seq(1,100) # secuencia DE 1 a 100
+id
+identify(x1,y, labels=id) # sirve para identificar los puntos en el gráfico, para saber cual es 
+# el punto que seleccionamos 
+
+
+######calculos a "patin"
+
+X1<-cbind(rep(1,100),x1) # forma matricial para esto se requiere de la libreria alr3 que no cargo
+beta.gorro<-solve(crossprod(X1))%*%t(X1)%*%y # también se necesita de la libreria
+# da las estimaciones de las betas
+
+beta1<-cov(x1,y)/var(x1) #
+beta1
+beta0<-mean(y)-beta1*mean(x1)
+beta0
+
+c(beta0,beta1) # vector de betas
+
+plot(y~x1,cex = 10*sqrt(cooks.distance(ajuste)),main = "Puntos proporcionales al tamaño de DCOOK")
+# la distancia de cook da las proporciones más grandes de los puntos 
+id<-seq(1,100)
+id
+identify(x1,y, labels=id) # para identificar cuales son los que tienen  la distancia más grande de cook
+ncv.test(ajuste) ##Varianza constante. H0:los residuos tienen varrianza cte.    
+# no se pudo correr 
+ncvTest(ajuste) # es otra forma pero tampoco corre
+plot(ajuste$fitted.values,ajuste$residuals) # para verificar que esta bien
+abline(h=c(-1.96,1.96),col=c("red","green")) # para poder ver los limites inferior y superior
+# se observa que algunas observaciones se salen del limite pero esto es a un nivel de confianza de 95%
+# 
+qqnorm(ajuste$residuals)
+qqline(ajuste$residuals, col="green") # prueba y linea de ajuste, da como resultado los cuantilies teoricos y los muestrales
+# los teoricos se deben de ajustar a los muestrales
+# el resultado es bueno pero aun asi hay varios que se siguen saliendo
+
+
+ad.test(ajuste$residuals) ##Prueba de normalidad 
+# prueba de anderson darling
+# valor de anderson darling y el valor p asociado  el cual no se rechaza
+
+
+########intervalos de confianza
+
+confint(ajuste) #
+
+##############################Predictions
+
+new <- data.frame(x1 = seq(0,10,length=50))
+slim.pred<- predict(ajuste,new,interval="prediction")
+slim.conf<- predict(ajuste, new, interval="confidence")
+matplot(new$x1,cbind(slim.conf,slim.pred[,-1]),
+        lty=c(1,2,2,3,3), type="l", col=c("red","blue","red","blue"),ylab=expression(hat(y)),xlab="x1")
+abline(h = mean(y), lty = 2, col = grey(0.6))
+abline(v = mean(x1), lty = 2, col = grey(0.6))
+points(mean(x1), mean(y), col = "green", pch = 20, cex = 1.5)
+
+# predicciones con intervalos de confianza 
+#Hasta aqui llega la regresión simple
+
+########################################comparación de modelos
+
+ajuste.sc<-lm(y~-1+x1)
+
+anova(ajuste.sc,ajuste)
+
+
+
+####################Regresion Multiple
+
+y<-3+1.8*x1-3*x2+5.8*x3+rnorm(100,0,2)
+y # 
+
+datos<-data.frame(y,x1,x2,x3) # pone a las variables en un dataframe
+datos # con observaciones del 1 al 100
+require("car")
+require("alr3")
+require(nortest)
+require(stats)
+pairs(datos) # da la grafica de las relaciones bivariadas
+# solo se ven correlaciones bivariadas que sirve para regresion simple no para una multiple
+
+par(mfrow=c(3,1)) #
+
+plot(x1,y)
+lines(lowess(y~x1))
+plot(x2,y)
+lines(lowess(y~x2))
+plot(x3,y).
+
+lines(lowess(y~x3))
+
+# no sale por las librerias 
+
+X<-cbind(rep(1,100),x1,x2,x3) # vector
+X # 
+
+beta.gorro<-solve(crossprod(X))%*%t(X)%*%y
+
+beta.gorro<-solve(t(X)%*%X,t(X)%*%y)#: otra opcion (resolver las ecuaciones normales)
+
+y.gorro<-X%*%beta.gorro
+y.gorro
+
+sigma.gorro<-(t(y-y.gorro)%*%(y-y.gorro))/(length(x1)-length(beta.gorro)) # length es para los grados de libertad
+sigma.gorro
+
+var.betagorro<-diag(sigma.gorro[1]*solve(crossprod(X)))
+
+r.cuad<-sum((y.gorro-mean(y))^2)/sum((y-mean(y))^2)
+r.cuad # 
+
+ajuste1<-lm(y~x1+x2+x3)
+ajuste1 # forma 1
+ajuste1.fit<-summary(ajuste1)
+ajuste1.fit # forma 2
+# en ambas formas sale lo mismo
+
+names(ajuste1)
+
+names(ajuste1.fit)
+
+ajuste1.fit$cov.unscaled # matriz de varianza covarianza no escalada
+
+#Alternativa para buscar procesos asociados con el modelo lineal, en otros paquetes
+
+class(ajuste1) # tipo de analisis que se realizó
+
+methods(class = class(ajuste1))
+
+#####################################################################################
+
+plot(ajuste1)
+
+par(mfrow=c(2,2))
+
+plot(ajuste1,which=1)
+plot(ajuste1,which=2)
+plot(ajuste1,which=3)
+plot(ajuste1,which=4)
+
+
+sd.res<-rstandard(ajuste1)
+std.res<-rstudent(ajuste1)
+
+
+
+id1<-seq(1,100)
+
+identify(x,y, labels=id1)
+
+influencia<-influence.measures(ajuste1) # da la covarianza re-escalada
+
+which(apply(influencia$is.inf, 1, any)) #influyentes sin determinar en que variable
+
+which(influencia$is.inf, 1) #determinando en que variable es influyente
+
+influ<-influencia[[1]] #para tenerla como una base
+
+update(m1, ~ . + I(x^2)) #Para actualizar el ajuste incluyendo otra(s) variable(s)
+
+confint(ajuste1)
+
+library(car)
+confidence.ellipse(ajuste1, Scheffe=TRUE,which.coef=c(1,2)) #Elipses de confianza.
